@@ -6,6 +6,8 @@ import { Link, useHistory } from 'react-router-dom';
 import GeneralNav from '../../Navbar/GeneralNav/GeneralNav';
 import BigError from '../../Errors/BigError';
 import { useTranslation } from 'react-i18next';
+import firebase from 'firebase/app';
+import { emailLinkAuth } from './emailLinkAuth';
 
 import * as S from './style';
 
@@ -65,13 +67,20 @@ const Signup = () => {
 
         if (isValid) {
             try {
-                await signup({
+                /* await signup({
                     email: e.target[0].value,
                     firstName: e.target[1].value,
                     lastName: e.target[2].value,
                     password: e.target[3].value,
                 });
-                history.push('/');
+                history.push('/'); */
+                let user = {
+                    email: e.target[0].value,
+                    firstName: e.target[1].value,
+                    lastName: e.target[2].value,
+                    password: e.target[3].value,
+                };
+                emailLinkAuth(user, history, signup);
             } catch (error) {
                 setInformation({
                     errorCode: 0,

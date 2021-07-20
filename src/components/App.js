@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ForgotPassword from './Auth/ForgotPassword/ForgotPassword';
 import Login from './Auth/Login/Login';
 import Signup from './Auth/Signup/Signup';
+import Register from './Auth/Signup/Register';
 import Footer from './Footer/Footer';
 import Homepage from './Dashboard/Homepage/Homepage';
 import Profile from './User/Profile/Profile';
@@ -32,6 +33,7 @@ function App() {
                 <Router basename={process.env.PUBLIC_URL}>
                     <Switch>
                         <PrivateRoute exact path="/" component={Homepage} />
+                        <Route path="/register" component={Register} />
                         <Route path="/signup" component={Signup} />
                         <Route path="/login" component={Login} />
                         <Route path="/forgot-password" component={ForgotPassword} />

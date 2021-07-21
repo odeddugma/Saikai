@@ -6,43 +6,66 @@ import firebase from 'firebase/app';
 const Register = () => {
     const { signup } = useAuth();
     const history = useHistory();
+    console.log('register');
 
     // Confirm the link is a sign-in with email link.
-    if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
-        // Additional state parameters can also be passed via URL.
-        // This can be used to continue the user's intended action before triggering
-        // the sign-in operation.
-        // Get the email if available. This should be available if the user completes
-        // the flow on the same device where they started it.
-        var email = window.localStorage.getItem('emailForSignIn');
-        if (!email) {
-            // User opened the link on a different device. To prevent session fixation
-            // attacks, ask the user to provide the associated email again. For example:
-            email = window.prompt('Please provide your email for confirmation');
+    try {
+        if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
+            console.log('email confirmed');
+            const email = window.localStorage.getItem('emailForSignIn');
+            firebase
+                .auth()
+                .signInWithEmailLink(email, window.location.href)
+                .then((result) => {
+                    console.log(result);
+                    const user = result.user;
+                    const userInfo = result.userInfo;
+                    // Clear email from storage.
+                    //window.localStorage.removeItem('emailForSignIn');
+                    if (result.user.emailVerified) {
+                        firebase.firestore().collection('users').doc(user.uid).set({
+                            firstName: userInfo.profile.given_name,
+                            lastName: userInfo.profile.family_name,
+                        });
+                        const batch = firebase.firestore().batch();
+                        const initData = [
+                            { Applied: { positionIds: [], title: 'Applied' } },
+                            { Contract: { positionIds: [], title: 'Contract' } },
+                            { Denied: { positionIds: [], title: 'Denied' } },
+                            { InProgress: { positionIds: [], title: 'In Progress' } },
+                            { ReceivedTask: { positionIds: [], title: 'Received Task' } },
+                        ];
+                        initData.forEach((doc) => {
+                            const docRef = firebase
+                                .firestore()
+                                .collection('users')
+                                .doc(user.uid)
+                                .collection('columns')
+                                .doc(Object.keys(doc)[0]);
+                            batch.set(docRef, Object.values(doc)[0]);
+                        });
+                        const batchCommit = batch.commit();
+                        return batchCommit;
+                        //return batchCommit;
+                    } else {
+                        alert('something went wrong');
+                    }
+                })
+                .then(() => {
+                    history.push('/');
+                })
+                .catch((error) => {
+                    console.log('errorCode', error.code);
+                    console.log('errorMessage', error.message);
+                });
+        } else {
+            console.log('error');
         }
-        // The client SDK will parse the code from the link for you.
-        firebase
-            .auth()
-            .signInWithEmailLink(email, window.location.href)
-            .then((result) => {
-                console.log(result);
-                // Clear email from storage.
-                //window.localStorage.removeItem('emailForSignIn');
-                if (result.additionalUserInfo.isNewUser && result.user.emailVerified) {
-                    //
-                    history.push('/');
-                } else {
-                    alert('something');
-                    history.push('/');
-                }
-            })
-            .catch((error) => {
-                console.log('errorCode', error.code);
-                console.log('errorMessage', error.message);
-            });
+    } catch (error) {
+        console.log(error);
     }
 
-    return <div></div>;
+    return <div>Please wait</div>;
 };
 
 export default Register;

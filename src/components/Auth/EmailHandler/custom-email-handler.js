@@ -4,22 +4,22 @@ document.addEventListener(
         // TODO: Implement getParameterByName()
 
         // Get the action to complete.
-        var mode = getParameterByName('mode');
+        const mode = getParameterByName('mode');
         // Get the one-time code from the query parameter.
-        var actionCode = getParameterByName('oobCode');
+        const actionCode = getParameterByName('oobCode');
         // (Optional) Get the continue URL from the query parameter if available.
-        var continueUrl = getParameterByName('continueUrl');
+        const continueUrl = getParameterByName('continueUrl');
         // (Optional) Get the language code if available.
-        var lang = getParameterByName('lang') || 'en';
+        const lang = getParameterByName('lang') || 'en';
 
         // Configure the Firebase SDK.
         // This is the minimum configuration required for the API to be used.
-        var config = {
+        const config = {
             apiKey: 'YOU_API_KEY', // Copy this key from the web initialization
             // snippet found in the Firebase console.
         };
-        var app = firebase.initializeApp(config);
-        var auth = app.auth();
+        const app = firebase.initializeApp(config);
+        const auth = app.auth();
 
         // Handle the user management action.
         switch (mode) {

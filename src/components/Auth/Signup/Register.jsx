@@ -17,15 +17,16 @@ const Register = () => {
                 .auth()
                 .signInWithEmailLink(email, window.location.href)
                 .then((result) => {
-                    console.log(result);
-                    const user = result.user;
-                    const userInfo = result.userInfo;
+                    console.log('result', result);
+                    const { user, additionalUserInfo } = result;
+                    console.log('user', user);
+                    console.log('additionalUserInfo', additionalUserInfo);
                     // Clear email from storage.
                     //window.localStorage.removeItem('emailForSignIn');
                     if (result.user.emailVerified) {
                         firebase.firestore().collection('users').doc(user.uid).set({
-                            firstName: userInfo.profile.given_name,
-                            lastName: userInfo.profile.family_name,
+                            /* firstName: userInfo.profile.given_name,
+                            lastName: userInfo.profile.family_name, */
                         });
                         const batch = firebase.firestore().batch();
                         const initData = [
